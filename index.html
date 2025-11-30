@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Smart Math Lab - Magic Square</title>
+<style>
+/* ===== Body & Background ===== */
+body {
+    margin: 0;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background: linear-gradient(135deg, #14ccda, #66a6ff, #fbc2eb, #a18cd1);
+    background-size: 400% 400%;
+    animation: gradientBG 20s ease infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+@keyframes gradientBG {
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+/* ===== Container ===== */
+.container {
+    width: 95%;
+    max-width: 900px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(216, 32, 32, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ===== Header ===== */
+.header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.header img {
+    width: 60px;
+    height: auto;
+    border-radius: 10px;
+}
+
+.header h1 {
+    font-size: 32px;
+    color: #660d0d;
+    text-shadow: 2px 2px rgba(0,0,0,0.4);
+}
+
+/* ===== Puzzle Area ===== */
+.puzzle-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Grid */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 80px);
+    grid-template-rows: repeat(3, 80px);
+    gap: 10px;
+}
+
+.cell {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(145deg, #6dd5ed, #2193b0);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.2s, border 0.2s;
+}
+
+.cell:hover { transform: scale(1.05); border-color: #ffd700; }
+.cell.highlight { border-color: #ffeb3b; animation: shake 0.3s; }
+
+@keyframes shake {
+    0%{transform: translateX(0);}
+    25%{transform: translateX(-5px);}
+    50%{transform: translateX(5px);}
+    75%{transform: translateX(-5px);}
+    100%{transform: translateX(0);}
+}
+
+/* Numbers */
+.numbers {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.num {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #f7971e, #ffd200);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    cursor: grab;
+    color: #bb3232;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: transform 0.2s, background 0.3s;
+}
+
+.num:active { transform: scale(1.2); background: linear-gradient(135deg, #ff6a6a, #fbc4ab); }
+
+/* Buttons */
+.buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+button:hover { transform: scale(1.1); }
+
+.check-btn { background: #a30f4d; color: #fff; }
+.reset-btn { background: #3c0cc0; color: #fff; }
+.new-btn { background: #f5e872; color: #000; }
+.hint-btn { background: #38f9d7; color: #000; }
+
+/* Drag message */
+.drag-msg {
+    position: absolute;
+    top: 5%;
+    padding: 8px 16px;
+    background: rgba(233, 181, 181, 0.8);
+    color: #9cb1da;
+    border-radius: 12px;
+    opacity: 0;
+    transition: 0.4s;
+    pointer-events: none;
+    font-weight: bold;
+    font-size: 16px;
+    text-shadow: 1px 1px #c76161;
+}
+
+/* Header for puzzle title */
+.puzzle-title {
+    font-size: 22px;
+    color: #c05858;
+    text-shadow: 1px 1px rgba(0,0,0,0.3);
+    margin-bottom: 10px;
+}
+
+/* ===== Responsive ===== */
+@media(max-width: 500px){
+    .grid { grid-template-columns: repeat(3, 60px); grid-template-rows: repeat(3, 60px); gap: 8px; }
+    .cell { width: 60px; height: 60px; font-size: 22px; }
+    .num { width: 40px; height: 40px; font-size: 18px; }
+    .header h1 { font-size: 26px; }
+    .puzzle-title { font-size: 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <img src="D:\Kavya\Puzzles\Test\images\logo.png" alt="Smart Math Lab Logo">
+        <h1>SMART MATH LAB</h1>
+    </div>
+
+    <!-- PUZZLE AREA -->
+    <div class="puzzle-area">
+        <div class="puzzle-title">Magic Square Puzzle</div>
+
+        <div class="grid" id="grid">
+            <div class="cell" data-id="0"></div>
+            <div class="cell" data-id="1"></div>
+            <div class="cell" data-id="2"></div>
+            <div class="cell" data-id="3"></div>
+            <div class="cell" data-id="4"></div>
+            <div class="cell" data-id="5"></div>
+            <div class="cell" data-id="6"></div>
+            <div class="cell" data-id="7"></div>
+            <div class="cell" data-id="8"></div>
+        </div>
+
+        <div class="numbers" id="numbers">
+            <div class="num" draggable="true">1</div>
+            <div class="num" draggable="true">2</div>
+            <div class="num" draggable="true">3</div>
+            <div class="num" draggable="true">4</div>
+            <div class="num" draggable="true">5</div>
+            <div class="num" draggable="true">6</div>
+            <div class="num" draggable="true">7</div>
+            <div class="num" draggable="true">8</div>
+            <div class="num" draggable="true">9</div>
+        </div>
+
+        <div class="buttons">
+            <button class="check-btn" onclick="check()">✔ Check Answer</button>
+            <button class="reset-btn" onclick="resetGrid()">🔄 Reset</button>
+            <button class="new-btn" onclick="newPuzzle()">🧩 New Puzzle</button>
+            <button class="hint-btn" onclick="toggleHint()">💡 Hint</button>
+        </div>
+
+        <div class="drag-msg" id="dragMsg">Nice Move!</div>
+    </div>
+
+</div>
+
+<script>
+const cells = document.querySelectorAll('.cell');
+const numbers = document.querySelectorAll('.num');
+const dragMsg = document.getElementById("dragMsg");
+const hints = [
+    "Try placing 5 in the center!",
+    "Opposites always add to 10.",
+    "Corners must be even numbers.",
+    "Every row must sum to 15."
+];
+
+const magicSquares = [
+    [2,7,6,9,5,1,4,3,8],
+    [4,3,8,9,5,1,2,7,6],
+    [6,1,8,7,5,3,2,9,4],
+    [8,1,6,3,5,7,4,9,2]
+];
+
+numbers.forEach(num => {
+    num.addEventListener("dragstart", e => {
+        e.dataTransfer.setData("text", num.innerText);
+        showDragMessage();
+    });
+});
+
+cells.forEach(cell => {
+    cell.addEventListener("dragover", e => e.preventDefault());
+    cell.addEventListener("drop", e => {
+        const number = e.dataTransfer.getData("text");
+        cell.innerText = number;
+    });
+});
+
+function showDragMessage() {
+    const messages = ["Great move!","Nice choice!","You're doing awesome!","Keep going!","Smart thinking!"];
+    dragMsg.innerText = messages[Math.floor(Math.random()*messages.length)];
+    dragMsg.style.opacity = 1;
+    setTimeout(()=> dragMsg.style.opacity = 0, 1200);
+}
+
+function check() {
+    const values = [...cells].map(c => Number(c.innerText || 0));
+    const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    let valid = true;
+    cells.forEach(c => c.classList.remove("highlight"));
+    lines.forEach(line => {
+        const sum = values[line[0]]+values[line[1]]+values[line[2]];
+        if(sum !== 15){ valid=false; line.forEach(i=>cells[i].classList.add("highlight")); }
+    });
+    if(valid){ alert("🎉 Congratulations! You solved it!"); }
+    else{ alert("❌ Some squares are incorrect. Try again!"); }
+}
+
+function resetGrid() {
+    cells.forEach(c=>c.innerText="");
+    cells.forEach(c=>c.classList.remove("highlight"));
+}
+
+function newPuzzle() {
+    resetGrid();
+    const puzzle = magicSquares[Math.floor(Math.random()*magicSquares.length)];
+    cells.forEach((c,i)=>{
+        if(Math.random()<0.5) c.innerText = puzzle[i];
+    });
+}
+
+function toggleHint() {
+    alert(hints[Math.floor(Math.random()*hints.length)]);
+}
+</script>
+
+</body>
+</html>
